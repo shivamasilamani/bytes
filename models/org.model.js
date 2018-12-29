@@ -9,7 +9,7 @@ const postSchema = mongoose.Schema({
     },
     imageUrl : String,
 }, {
-    timestamp : true
+    timestamps : true
 });
 
 const orgSchema = mongoose.Schema({
@@ -27,7 +27,7 @@ const orgSchema = mongoose.Schema({
     },
     posts : [postSchema]
 }, {
-    timestamp : true
+    timestamps : true
 });
 
 module.exports = mongoose.model("orgs", orgSchema);

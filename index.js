@@ -3,6 +3,7 @@ const app = express();
 
 const feedRoute = require("./routes/feed.route");
 const orgRoute = require("./routes/org.route");
+const userRoute = require("./routes/user.route");
 const dbConfig = require("./configs/database.config");
 const mongoose = require("mongoose");
 
@@ -21,6 +22,7 @@ app.get("/", (req, res)=>{
     res.send("Begining of an amazing journey!!");
 });
 
+app.use("/user", userRoute);
 app.use("/feed", feedRoute);
 app.use("/org", orgRoute);
 

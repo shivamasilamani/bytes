@@ -19,7 +19,6 @@ module.exports = {
     },
 
     createPost : (req,res, orgId)=>{
-
         let post = {
             owner : req.body.owner,
             text  : req.body.text
