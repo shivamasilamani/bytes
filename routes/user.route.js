@@ -10,8 +10,12 @@ route.get("/", (req, res)=>{
     userController.getUsers(req,res);
 });
 
-route.post("/", (req, res)=>{
+route.post("/register", (req, res)=>{
     userController.createUser(req, res);
+});
+
+route.post("/login", (req, res)=>{
+    userController.loginUser(req, res);
 });
 
 module.exports = route;
