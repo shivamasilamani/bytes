@@ -6,6 +6,7 @@ const orgRoute = require("./routes/org.route");
 const userRoute = require("./routes/user.route");
 const dbConfig = require("./configs/database.config");
 const mongoose = require("mongoose");
+const passport = require("passport");
 
 mongoose.connect(dbConfig.server + "/" + dbConfig.database, {
     useNewUrlParser: true
@@ -21,6 +22,9 @@ app.get("/", (req, res)=>{
     res.status(200);    
     res.send("Begining of an amazing journey!!");
 });
+
+app.use(passport.initialize());
+require("./configs/passport.config")(passport);
 
 app.use("/user", userRoute);
 app.use("/feed", feedRoute);

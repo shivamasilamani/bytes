@@ -1,25 +1,6 @@
 const userModel = require("../models/user.model");
-const crypto = require("crypto");
-
-function getHashedPassword(password, salt) {
-    const length = 16;
-
-    if (!salt) {
-        const randomSalt = crypto.randomBytes(Math.ceil(length / 2))
-            .toString('hex')
-            .slice(0, length);
-
-        salt = randomSalt;
-    }
-
-    let hash = crypto.createHmac('sha512', salt);
-    hash.update(password);
-    let passwordHash = hash.digest('hex');
-    return {
-        salt: salt,
-        passwordHash: passwordHash
-    };
-}
+const authUtil = require("../utils/auth.util");
+const jwt = require("jsonwebtoken");
 
 function getOrganization(email) {
     return "5c278e08bcc20c5ff8f16c78";
@@ -39,7 +20,7 @@ module.exports = {
     },
 
     createUser: (req, res) => {
-        const hashedPassword = getHashedPassword(req.body.password);
+        const hashedPassword = authUtil.getHashedPassword(req.body.password);
         const organization = getOrganization(req.body.email);
 
         const user = new userModel({
@@ -66,7 +47,7 @@ module.exports = {
         userModel.findOne({ 'email': req.body.email })
             .then((data) => {
                 if (data) {
-                    const hashedPassword = getHashedPassword(req.body.password, data.salt);
+                    const hashedPassword = authUtil.getHashedPassword(req.body.password, data.salt);
                     if (data.password === hashedPassword.passwordHash) {
                         res.status(200);
                         res.send("Login Successfull");
@@ -83,5 +64,43 @@ module.exports = {
                 res.status(500);
                 res.send(err.message);
             });
+    },
+
+    authenticate: (req, res) => {
+        userModel.findOne({ 'email': req.body.email })
+            .then((data) => {
+                if (data) {
+                    const hashedPassword = authUtil.getHashedPassword(req.body.password, data.salt);
+                    if (data.password === hashedPassword.passwordHash) {
+                        const user = {
+                            _id : data._id,
+                            email : data.email,
+                            name : data.name,
+                            isActive : data.isActive,
+                            organization : data.organization
+                        };
+                        const token = jwt.sign(user, "secret", {
+                            expiresIn: 30000
+                        });
+                        res.status(200);
+                        res.json({success: true, token: token});
+                    } else {
+                        res.status(401);
+                        res.send("Unauthorized");
+                    }
+                }else{
+                    res.status(401);
+                    res.send("Unauthorized");
+                }
+            })
+            .catch((err) => {
+                res.status(500);
+                res.send(err.message);
+            });
+    },
+
+    resetPassword: function(req, res){
+        res.status(200);
+        res.send("Password Reset Triggered!!");
     }
 };
